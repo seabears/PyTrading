@@ -22,7 +22,7 @@ import urllib.error
 import urllib.parse
 import urllib.request
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Any
 
@@ -76,17 +76,27 @@ class KisStockClient:
         account: KisAccount | None = None,
         env_path: str | Path = KIS_ENV_PATH,
         token_path: str | Path = KIS_TOKEN_PATH,
-        base_url: str = KIS_BASE_URL,
+        base_url: str | None = None,
         timeout: float = 10.0,
+        request_interval: float = 0.1,
     ):
         # account를 직접 전달하지 않으면 기본 환경 파일에서 키를 읽는다.
+        environment = load_env(Path(env_path))
         self.account = account or load_kis_account(Path(env_path))
 
         # 토큰 저장 경로와 API 주소를 인스턴스에 보관한다.
         # 테스트할 때는 이 값을 가짜 서버 주소나 임시 파일로 바꿀 수 있다.
         self.token_path = Path(token_path)
-        self.base_url = base_url.rstrip("/")
+        configured_url = (
+            base_url
+            or os.getenv("KIS_BASE_URL")
+            or environment.get("KIS_BASE_URL")
+            or KIS_BASE_URL
+        )
+        self.base_url = configured_url.rstrip("/")
         self.timeout = timeout
+        # 연속 기간 조회 중 KIS 호출 제한에 걸리지 않도록 요청 사이에 간격을 둔다.
+        self.request_interval = max(0.0, request_interval)
 
     def quote(self, symbol: str, market: str = Market.NASDAQ.value) -> StockQuote:
         """해외주식 한 종목의 현재가를 조회한다."""
@@ -137,47 +147,117 @@ class KisStockClient:
         start: str = "",
         end: str = "",
     ) -> StockHistory:
-        """해외주식의 일봉 데이터를 조회한다."""
+        """국내 또는 해외주식의 지정 기간 일봉 데이터를 조회한다."""
 
-        # 현재 구현은 KIS 기간별시세 API의 일봉만 지원한다.
         if timeframe != Timeframe.DAY.value:
             raise ValueError("KIS REST history currently supports only the 1d timeframe.")
 
         symbol = symbol.upper()
+        start, end = _validate_date_range(start, end)
+        if market.upper() in {"KOREA", "KR", "KRX"}:
+            candles, raw = self._domestic_history(symbol, start, end)
+            normalized_market = Market.KOREA.value
+        else:
+            candles, raw = self._overseas_history(symbol, market, start, end)
+            normalized_market = market.upper()
 
-        # 해외주식 기간별시세 API 호출.
-        # GUBN=0은 일봉, BYMD는 조회 기준 종료일, MODP=1은 수정주가 반영이다.
-        payload = self._get_json(
-            "/uapi/overseas-price/v1/quotations/dailyprice",
-            "HHDFS76240000",
-            {
-                "AUTH": "",
-                "EXCD": self._market_code(market),
-                "SYMB": symbol,
-                "GUBN": "0",
-                "BYMD": end,
-                "MODP": "1",
-            },
-        )
-
-        # output2에는 최신 날짜부터 과거 날짜 순서로 봉 데이터가 들어온다.
-        rows = payload.get("output2") or []
-
-        # 화면과 차트에서 오래된 날짜부터 보이도록 reversed()로 순서를 뒤집는다.
-        # start/end가 입력됐다면 해당 날짜 범위만 남긴다.
-        candles = [
-            parse_overseas_candle(row)
-            for row in reversed(rows)
-            if isinstance(row, dict) and _date_in_range(str(row.get("xymd") or ""), start, end)
-        ]
         return StockHistory(
             symbol=symbol,
             provider=self.provider,
-            market=market.upper(),
+            market=normalized_market,
             timeframe=timeframe,
             candles=candles,
-            raw=payload,
+            raw=raw,
         )
+
+    def _domestic_history(
+        self, symbol: str, start: str, end: str
+    ) -> tuple[list[StockCandle], dict[str, Any]]:
+        """국내주식 기간별 시세를 90일 단위로 나눠 빠짐없이 조회한다."""
+
+        rows_by_date: dict[str, dict[str, Any]] = {}
+        payloads: list[dict[str, Any]] = []
+        range_start = datetime.strptime(start, "%Y%m%d")
+        chunk_end = datetime.strptime(end, "%Y%m%d")
+
+        while chunk_end >= range_start:
+            if payloads:
+                time.sleep(self.request_interval)
+            chunk_start = max(range_start, chunk_end - timedelta(days=89))
+            payload = self._get_json(
+                "/uapi/domestic-stock/v1/quotations/inquire-daily-itemchartprice",
+                "FHKST03010100",
+                {
+                    "FID_COND_MRKT_DIV_CODE": "J",
+                    "FID_INPUT_ISCD": symbol,
+                    "FID_INPUT_DATE_1": chunk_start.strftime("%Y%m%d"),
+                    "FID_INPUT_DATE_2": chunk_end.strftime("%Y%m%d"),
+                    "FID_PERIOD_DIV_CODE": "D",
+                    # KIS 공식 규격에서 0은 수정주가, 1은 원주가다.
+                    "FID_ORG_ADJ_PRC": "0",
+                },
+            )
+            payloads.append(payload)
+            for row in payload.get("output2") or []:
+                if isinstance(row, dict):
+                    date = str(row.get("stck_bsop_date") or "")
+                    if _date_in_range(date, start, end):
+                        rows_by_date[date] = row
+            chunk_end = chunk_start - timedelta(days=1)
+
+        candles = [parse_domestic_candle(rows_by_date[date]) for date in sorted(rows_by_date)]
+        return candles, {"pages": payloads}
+
+    def _overseas_history(
+        self, symbol: str, market: str, start: str, end: str
+    ) -> tuple[list[StockCandle], dict[str, Any]]:
+        """
+        해외주식 기간별 시세를 가장 오래된 조회일 이전으로 이동하며 반복 조회한다.
+
+        dailyprice API는 한 번에 제한된 개수만 반환하므로 BYMD를 이전 날짜로
+        옮겨 장기간 데이터도 수집한다. 중복 날짜는 날짜 키로 제거한다.
+        """
+
+        rows_by_date: dict[str, dict[str, Any]] = {}
+        payloads: list[dict[str, Any]] = []
+        request_end = end
+        previous_oldest = ""
+
+        for _ in range(100):
+            if payloads:
+                time.sleep(self.request_interval)
+            payload = self._get_json(
+                "/uapi/overseas-price/v1/quotations/dailyprice",
+                "HHDFS76240000",
+                {
+                    "AUTH": "",
+                    "EXCD": self._market_code(market),
+                    "SYMB": symbol,
+                    "GUBN": "0",
+                    "BYMD": request_end,
+                    "MODP": "1",
+                },
+            )
+            payloads.append(payload)
+            rows = [row for row in (payload.get("output2") or []) if isinstance(row, dict)]
+            dates = [str(row.get("xymd") or "") for row in rows if row.get("xymd")]
+            for row in rows:
+                date = str(row.get("xymd") or "")
+                if _date_in_range(date, start, end):
+                    rows_by_date[date] = row
+
+            if not dates:
+                break
+            oldest = min(dates)
+            if oldest <= start or oldest == previous_oldest:
+                break
+            previous_oldest = oldest
+            request_end = (datetime.strptime(oldest, "%Y%m%d") - timedelta(days=1)).strftime("%Y%m%d")
+        else:
+            raise RuntimeError("KIS 해외주식 과거 데이터 조회가 최대 페이지 수를 초과했습니다.")
+
+        candles = [parse_overseas_candle(rows_by_date[date]) for date in sorted(rows_by_date)]
+        return candles, {"pages": payloads}
 
     def _get_json(self, path: str, tr_id: str, params: dict[str, str]) -> dict[str, Any]:
         """
@@ -328,6 +408,21 @@ def parse_overseas_candle(row: dict[str, Any]) -> StockCandle:
     )
 
 
+def parse_domestic_candle(row: dict[str, Any]) -> StockCandle:
+    """KIS 국내주식 일봉 응답을 공통 StockCandle 객체로 변환한다."""
+
+    close = to_float(row.get("stck_clpr")) or 0.0
+    return StockCandle(
+        time=str(row.get("stck_bsop_date") or ""),
+        open=to_float(row.get("stck_oprc")) or close,
+        high=to_float(row.get("stck_hgpr")) or close,
+        low=to_float(row.get("stck_lwpr")) or close,
+        close=close,
+        volume=to_int(row.get("acml_vol")) or 0,
+        currency="KRW",
+    )
+
+
 def load_env(path: Path) -> dict[str, str]:
     """KEY=VALUE 형식의 단순 env 파일을 딕셔너리로 읽는다."""
 
@@ -395,3 +490,18 @@ def _date_in_range(value: str, start: str, end: str) -> bool:
     """YYYYMMDD 문자열이 사용자가 요청한 시작일/종료일 범위 안인지 확인한다."""
 
     return (not start or value >= start) and (not end or value <= end)
+
+
+def _validate_date_range(start: str, end: str) -> tuple[str, str]:
+    """날짜를 YYYYMMDD로 검증하고 시작일이 종료일보다 늦지 않게 한다."""
+
+    if not start or not end:
+        raise ValueError("KIS 과거 데이터 조회에는 시작일과 종료일이 모두 필요합니다.")
+    try:
+        start_date = datetime.strptime(start, "%Y%m%d")
+        end_date = datetime.strptime(end, "%Y%m%d")
+    except ValueError as exc:
+        raise ValueError("날짜는 YYYYMMDD 형식이어야 합니다.") from exc
+    if start_date > end_date:
+        raise ValueError("시작일은 종료일보다 늦을 수 없습니다.")
+    return start, end
