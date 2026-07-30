@@ -12,10 +12,11 @@ from __future__ import annotations
 import sys
 from collections.abc import Sequence
 from dataclasses import dataclass
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 import math
 from pathlib import Path
 import re
+import unicodedata
 
 from pytrading.backtest import (
     BacktestConfig,
@@ -24,9 +25,14 @@ from pytrading.backtest import (
     PortfolioBacktestEngine,
 )
 from pytrading.data import (
+    DEFAULT_ADVISOR_STATE_PATH,
+    DEFAULT_HOLDINGS_PATH,
+    load_advisor_state,
     load_candles_from_csv,
     load_candles_from_kis,
+    load_holdings_csv,
     load_portfolio_from_kis,
+    save_advisor_state,
     save_candles_to_csv,
 )
 from pytrading.reporting import (
@@ -37,7 +43,11 @@ from pytrading.reporting import (
 )
 from pytrading.stocks import StockProvider, create_stock_client
 from pytrading.stocks.models import StockCandle
-from pytrading.strategies import MovingAverageCrossStrategy
+from pytrading.strategies import (
+    AdviceAction,
+    MovingAverageCrossStrategy,
+    analyze_holdings,
+)
 
 
 @dataclass(frozen=True)
@@ -69,6 +79,65 @@ def format_number(value, digits: int = 2) -> str:
     if isinstance(value, int):
         return f"{value:,}"
     return f"{value:,.{digits}f}"
+
+
+def format_quantity(value: float) -> str:
+    """정수 수량은 소수점 없이, 소수 수량은 최대 네 자리까지 표시한다."""
+
+    numeric = float(value)
+    if numeric.is_integer():
+        return f"{int(numeric):,}"
+    return f"{numeric:,.4f}".rstrip("0").rstrip(".")
+
+
+def display_width(value: str) -> int:
+    """터미널에서 한글과 영문이 차지하는 실제 칸 수를 계산한다."""
+
+    width = 0
+    for character in value:
+        if unicodedata.combining(character):
+            continue
+        width += 2 if unicodedata.east_asian_width(character) in {"W", "F"} else 1
+    return width
+
+
+def pad_display(value: str, width: int, *, right: bool = False) -> str:
+    """실제 표시 폭을 기준으로 문자열 좌우에 공백을 채운다."""
+
+    padding = " " * max(0, width - display_width(value))
+    return f"{padding}{value}" if right else f"{value}{padding}"
+
+
+def render_text_table(
+    headers: Sequence[str],
+    rows: Sequence[Sequence[str]],
+    *,
+    right_aligned: set[int] | None = None,
+) -> str:
+    """한글 표시 폭을 보정한 테두리형 터미널 표를 만든다."""
+
+    align_right = right_aligned or set()
+    normalized_rows = [[str(value) for value in row] for row in rows]
+    widths = [
+        max(
+            [display_width(headers[index])]
+            + [display_width(row[index]) for row in normalized_rows]
+        )
+        for index in range(len(headers))
+    ]
+    border = "+-" + "-+-".join("-" * width for width in widths) + "-+"
+
+    def render_row(row: Sequence[str]) -> str:
+        cells = [
+            pad_display(value, widths[index], right=index in align_right)
+            for index, value in enumerate(row)
+        ]
+        return "| " + " | ".join(cells) + " |"
+
+    lines = [border, render_row(headers), border]
+    lines.extend(render_row(row) for row in normalized_rows)
+    lines.append(border)
+    return "\n".join(lines)
 
 
 def render_quotes(quotes) -> str:
@@ -104,6 +173,140 @@ def render_history(history) -> str:
             f"{format_number(candle.high):>12} {format_number(candle.low):>12} "
             f"{format_number(candle.close):>12} {format_number(candle.volume, 0):>14}"
         )
+    return "\n".join(lines)
+
+
+def render_holdings(portfolio) -> str:
+    """현재 보유 목록을 터미널 표로 만든다."""
+
+    rows = [
+        (
+            holding.symbol,
+            holding.market,
+            holding.investment_style.value,
+            holding.name,
+            format_number(holding.quantity, 4),
+            format_number(holding.average_price_usd, 4),
+            format_number(holding.purchase_amount_usd),
+            f"{holding.weight_percent:.2f}%",
+            f"{holding.target_weight_percent:.0f}%",
+            f"{holding.maximum_weight_percent:.0f}%",
+        )
+        for holding in portfolio.holdings
+    ]
+    table = render_text_table(
+        (
+            "TICKER",
+            "MARKET",
+            "STYLE",
+            "NAME",
+            "QTY",
+            "AVG USD",
+            "COST USD",
+            "WEIGHT",
+            "TARGET",
+            "MAX",
+        ),
+        rows,
+        right_aligned={4, 5, 6, 7, 8, 9},
+    )
+    return (
+        f"{table}\n"
+        f"총 매입금액: {portfolio.total_purchase_amount_usd:,.2f} USD"
+    )
+
+
+def render_holdings_advice(result) -> str:
+    """매매 의견을 행동별로 나눠 한눈에 보이는 표로 만든다."""
+
+    action_order = (
+        AdviceAction.SELL_REVIEW,
+        AdviceAction.REDUCE_50,
+        AdviceAction.REDUCE_25,
+        AdviceAction.WATCH,
+        AdviceAction.ADD,
+        AdviceAction.HOLD,
+        AdviceAction.REVIEW,
+    )
+    grouped = {
+        action: [advice for advice in result.advices if advice.action == action]
+        for action in action_order
+    }
+    summary = " | ".join(
+        f"{action.value} {len(grouped[action])}"
+        for action in action_order
+        if grouped[action]
+    )
+    dates = [advice.as_of for advice in result.advices if advice.as_of]
+    as_of = max(dates) if dates else "-"
+    lines = [
+        f"신호 요약: {summary}",
+        f"기준 종가일: {as_of}    "
+        f"주식 평가금액: {result.estimated_portfolio_value_usd:,.2f} USD",
+        f"투자 가능 현금: {result.available_cash_usd:,.2f} USD    "
+        f"추천 후 잔여 현금: {result.remaining_cash_usd:,.2f} USD",
+    ]
+
+    for action in action_order:
+        advices = grouped[action]
+        if not advices:
+            continue
+        rows = []
+        for advice in advices:
+            price = format_number(advice.current_price_usd)
+            return_rate = (
+                f"{advice.return_rate:+.2f}%" if advice.return_rate is not None else "-"
+            )
+            if advice.suggested_quantity > 0:
+                order = (
+                    f"{format_quantity(advice.suggested_quantity)}주 / "
+                    f"${format_number(advice.suggested_amount_usd)}"
+                )
+            else:
+                order = "-"
+            rows.append(
+                (
+                    advice.symbol,
+                    advice.investment_style.value,
+                    advice.name,
+                    price,
+                    return_rate,
+                    f"{advice.current_weight_percent:.2f}%",
+                    order,
+                    f"{advice.signal_streak}회",
+                    " / ".join(advice.reasons),
+                )
+            )
+
+        lines.extend(
+            (
+                "",
+                f"[{action.value}] {len(advices)}종목",
+                render_text_table(
+                    (
+                        "TICKER",
+                        "TYPE",
+                        "NAME",
+                        "현재가",
+                        "손익률",
+                        "비중",
+                        "제안",
+                        "지속",
+                        "근거",
+                    ),
+                    rows,
+                    right_aligned={3, 4, 5, 6, 7},
+                ),
+            )
+        )
+
+    lines.extend(
+        (
+            "",
+            "신호는 기준일 종가로 계산했습니다.",
+            "실제 주문 전 다음 거래일 가격과 기업 공시를 다시 확인하세요.",
+        )
+    )
     return "\n".join(lines)
 
 
@@ -255,9 +458,11 @@ def choose_main_action() -> str:
     print("3. KIS 실제 과거 데이터 백테스트")
     print("4. CSV 파일 백테스트")
     print("5. KIS 다중 종목 포트폴리오 백테스트")
+    print("6. 현재 보유 목록 조회")
+    print("7. 현재 보유 종목 매매 의견")
     print("0. 종료\n")
     return ask_choice(
-        "선택 (0~5): ",
+        "선택 (0~7): ",
         {
             "0": "exit",
             "1": "quote",
@@ -265,6 +470,8 @@ def choose_main_action() -> str:
             "3": "kis_backtest",
             "4": "csv_backtest",
             "5": "portfolio_backtest",
+            "6": "holdings",
+            "7": "holdings_advice",
         },
     )
 
@@ -669,6 +876,81 @@ def run_portfolio_backtest() -> None:
         print(f"\n포트폴리오 거래 내역 저장: {inputs.trades_csv}")
 
 
+def run_holdings() -> None:
+    """Portfolio CSV에서 현재 보유 목록을 읽어 출력한다."""
+
+    portfolio = load_holdings_csv(DEFAULT_HOLDINGS_PATH)
+    print(f"\n[현재 보유 목록] {DEFAULT_HOLDINGS_PATH}\n")
+    print(render_holdings(portfolio))
+
+
+def run_holdings_advice() -> None:
+    """현재 보유 목록과 KIS 일봉으로 매수·매도 의견을 출력한다."""
+
+    portfolio = load_holdings_csv(DEFAULT_HOLDINGS_PATH)
+    available_cash = ask_float(
+        "추가 투자 가능 현금 USD (기본 0): ",
+        default=0.0,
+        minimum=0.0,
+    )
+    refresh = ask_choice(
+        "오늘 받은 시세 캐시를 새로 받을까요? (y/N): ",
+        {"": "no", "n": "no", "no": "no", "y": "yes", "yes": "yes"},
+    ) == "yes"
+    end_day = date.today()
+    start_day = end_day - timedelta(days=730)
+    start = start_day.strftime("%Y%m%d")
+    end = end_day.strftime("%Y%m%d")
+
+    symbols_by_market: dict[str, list[str]] = {}
+    for holding in portfolio.holdings:
+        symbols_by_market.setdefault(holding.market, []).append(holding.symbol)
+
+    histories: dict[str, list[StockCandle]] = {}
+    errors: dict[str, str] = {}
+    cache_hits: list[str] = []
+    downloaded: list[str] = []
+    print(f"\nKIS 일봉 준비 중: {start} ~ {end}")
+    for market, symbols in symbols_by_market.items():
+        try:
+            data = load_portfolio_from_kis(
+                symbols=symbols,
+                market=market,
+                start=start,
+                end=end,
+                refresh=refresh,
+            )
+        except (RuntimeError, ValueError) as exc:
+            errors.update({symbol: str(exc) for symbol in symbols})
+            continue
+        histories.update(data.histories)
+        errors.update(data.errors)
+        cache_hits.extend(data.cache_hits)
+        downloaded.extend(data.downloaded)
+
+    if not histories:
+        details = "; ".join(f"{symbol}: {message}" for symbol, message in errors.items())
+        raise ValueError(f"분석할 일봉 데이터를 준비하지 못했습니다. {details}".strip())
+
+    advisor_state = load_advisor_state(DEFAULT_ADVISOR_STATE_PATH)
+    result = analyze_holdings(
+        portfolio,
+        histories,
+        available_cash_usd=available_cash,
+        advisor_state=advisor_state,
+    )
+    save_advisor_state(result.updated_state, DEFAULT_ADVISOR_STATE_PATH)
+    print("\n[현재 보유 종목 매매 의견]\n")
+    print(render_holdings_advice(result))
+    print(f"\n추천 상태 저장: {DEFAULT_ADVISOR_STATE_PATH}")
+    if cache_hits:
+        print(f"\n캐시 사용: {', '.join(cache_hits)}")
+    if downloaded:
+        print(f"KIS 다운로드: {', '.join(downloaded)}")
+    for symbol, message in errors.items():
+        print(f"데이터 제외: {symbol} ({message})")
+
+
 def _execute_backtest(
     candles: Sequence[StockCandle],
     settings: BacktestInputs,
@@ -712,6 +994,10 @@ def main() -> int:
             run_csv_backtest()
         elif action == "portfolio_backtest":
             run_portfolio_backtest()
+        elif action == "holdings":
+            run_holdings()
+        elif action == "holdings_advice":
+            run_holdings_advice()
         return 0
     except (EOFError, KeyboardInterrupt):
         print("\n프로그램을 종료합니다.")

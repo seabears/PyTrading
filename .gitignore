@@ -4,6 +4,7 @@
 
 temp/
 data/cache/
+Portfolio/advisor_state.json
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

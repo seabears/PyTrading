@@ -7,9 +7,100 @@ from contextlib import redirect_stdout
 from unittest.mock import patch
 
 import main as app
+from pytrading.data import Holding, HoldingsPortfolio, InvestmentStyle
+from pytrading.strategies import (
+    AdviceAction,
+    HoldingAdvice,
+    HoldingsAdviceResult,
+)
 
 
 class InteractiveMainTest(unittest.TestCase):
+    def test_holdings_advice_is_grouped_and_aligned(self):
+        result = HoldingsAdviceResult(
+            advices=[
+                HoldingAdvice(
+                    symbol="COIN",
+                    name="코인베이스 글로벌",
+                    investment_style=InvestmentStyle.TACTICAL,
+                    action=AdviceAction.SELL_REVIEW,
+                    as_of="20260730",
+                    current_price_usd=161.95,
+                    return_rate=-49.55,
+                    current_weight_percent=1.35,
+                    suggested_quantity=1,
+                    suggested_amount_usd=161.95,
+                    reasons=("변동성 보정 손절선 11.2% 도달",),
+                ),
+                HoldingAdvice(
+                    symbol="O",
+                    name="리얼티인컴",
+                    investment_style=InvestmentStyle.INCOME,
+                    action=AdviceAction.ADD,
+                    as_of="20260730",
+                    current_price_usd=63.78,
+                    return_rate=6.2,
+                    current_weight_percent=1.6,
+                    suggested_quantity=15,
+                    suggested_amount_usd=956.7,
+                    reasons=("200일 상승 추세", "RSI 52.7"),
+                ),
+            ],
+            estimated_portfolio_value_usd=11_990.21,
+        )
+
+        output = app.render_holdings_advice(result)
+
+        self.assertIn("신호 요약: 전량매도 검토 1 | 추가매수 1", output)
+        self.assertIn("[전량매도 검토] 1종목", output)
+        self.assertIn("[추가매수] 1종목", output)
+        table_groups: list[list[str]] = []
+        current_group: list[str] = []
+        for line in output.splitlines():
+            if line.startswith(("+", "|")):
+                current_group.append(line)
+            elif current_group:
+                table_groups.append(current_group)
+                current_group = []
+        if current_group:
+            table_groups.append(current_group)
+        self.assertTrue(table_groups)
+        for group in table_groups:
+            self.assertEqual(len({app.display_width(line) for line in group}), 1)
+
+    def test_holdings_table_aligns_korean_text_by_display_width(self):
+        portfolio = HoldingsPortfolio(
+            holdings=[
+                Holding(
+                    symbol="COIN",
+                    name="코인베이스 글로벌",
+                    market="NASDAQ",
+                    quantity=1,
+                    average_price_usd=321,
+                    purchase_amount_usd=321,
+                    weight_percent=25.5,
+                ),
+                Holding(
+                    symbol="IBM",
+                    name="IBM",
+                    market="NYSE",
+                    quantity=2,
+                    average_price_usd=218.135,
+                    purchase_amount_usd=436.27,
+                    weight_percent=74.5,
+                ),
+            ],
+            total_purchase_amount_usd=757.27,
+        )
+
+        output = app.render_holdings(portfolio)
+        table_lines = [
+            line for line in output.splitlines() if line.startswith(("+", "|"))
+        ]
+
+        self.assertEqual(len({app.display_width(line) for line in table_lines}), 1)
+        self.assertIn("총 매입금액: 757.27 USD", output)
+
     def test_exit_is_selected_from_screen_menu(self):
         output = io.StringIO()
         with patch("builtins.input", side_effect=["0"]), redirect_stdout(output):
@@ -51,6 +142,16 @@ class InteractiveMainTest(unittest.TestCase):
         output = io.StringIO()
         with patch("builtins.input", side_effect=["5"]), redirect_stdout(output):
             self.assertEqual(app.choose_main_action(), "portfolio_backtest")
+
+    def test_holdings_menu_can_be_selected(self):
+        output = io.StringIO()
+        with patch("builtins.input", side_effect=["6"]), redirect_stdout(output):
+            self.assertEqual(app.choose_main_action(), "holdings")
+
+    def test_holdings_advice_menu_can_be_selected(self):
+        output = io.StringIO()
+        with patch("builtins.input", side_effect=["7"]), redirect_stdout(output):
+            self.assertEqual(app.choose_main_action(), "holdings_advice")
 
     def test_domestic_symbol_selects_korea_automatically(self):
         output = io.StringIO()
