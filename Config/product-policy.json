@@ -1,0 +1,311 @@
+{
+  "allowed_asset_types": [
+    "stock",
+    "bond",
+    "etf"
+  ],
+  "disallowed_asset_types": [
+    "etn",
+    "elw",
+    "future",
+    "option",
+    "other"
+  ],
+  "unknown_instrument": "deny",
+  "verified_instruments": {
+    "AAPL": {
+      "asset_type": "stock",
+      "name": "APPLE INC",
+      "evidence": "KIS official stock master; current 30-stock watchlist"
+    },
+    "AMD": {
+      "asset_type": "stock",
+      "name": "ADVANCED MICRO DEVICES INC",
+      "evidence": "KIS official stock master; current 30-stock watchlist"
+    },
+    "AMZN": {
+      "asset_type": "stock",
+      "name": "AMAZON COM INC",
+      "evidence": "KIS official stock master; current 30-stock watchlist"
+    },
+    "ARM": {
+      "asset_type": "stock",
+      "name": "ARM HOLDINGS PLC SPON ADS EACH REP 1 ORD SHS",
+      "evidence": "KIS official stock master; current 30-stock watchlist"
+    },
+    "ASML": {
+      "asset_type": "stock",
+      "name": "ASML HOLDING NV EUR0.09 NY REGISTRY SHS 2012",
+      "evidence": "KIS official stock master; current 30-stock watchlist"
+    },
+    "AVGO": {
+      "asset_type": "stock",
+      "name": "BROADCOM INC",
+      "evidence": "KIS official stock master; current 30-stock watchlist"
+    },
+    "COIN": {
+      "asset_type": "stock",
+      "name": "COINBASE GLOBAL INC",
+      "evidence": "KIS official stock master; current 30-stock watchlist"
+    },
+    "GOOGL": {
+      "asset_type": "stock",
+      "name": "ALPHABET INC",
+      "evidence": "KIS official stock master; current 30-stock watchlist"
+    },
+    "INTC": {
+      "asset_type": "stock",
+      "name": "INTEL CORP",
+      "evidence": "KIS official stock master; current 30-stock watchlist"
+    },
+    "ISRG": {
+      "asset_type": "stock",
+      "name": "INTUITIVE SURGICAL INC",
+      "evidence": "KIS official stock master; current 30-stock watchlist"
+    },
+    "META": {
+      "asset_type": "stock",
+      "name": "META PLATFORMS INC",
+      "evidence": "KIS official stock master; current 30-stock watchlist"
+    },
+    "MSFT": {
+      "asset_type": "stock",
+      "name": "MICROSOFT CORP",
+      "evidence": "KIS official stock master; current 30-stock watchlist"
+    },
+    "MU": {
+      "asset_type": "stock",
+      "name": "MICRON TECHNOLOGY INC",
+      "evidence": "KIS official stock master; current 30-stock watchlist"
+    },
+    "NVDA": {
+      "asset_type": "stock",
+      "name": "NVIDIA CORP",
+      "evidence": "KIS official stock master; current 30-stock watchlist"
+    },
+    "PLTR": {
+      "asset_type": "stock",
+      "name": "PALANTIR TECH INC",
+      "evidence": "KIS official stock master; current 30-stock watchlist"
+    },
+    "QCOM": {
+      "asset_type": "stock",
+      "name": "QUALCOMM INC",
+      "evidence": "KIS official stock master; current 30-stock watchlist"
+    },
+    "SNDK": {
+      "asset_type": "stock",
+      "name": "SANDISK CORP",
+      "evidence": "KIS official stock master; current 30-stock watchlist"
+    },
+    "SPCX": {
+      "asset_type": "stock",
+      "name": "SPACE EXPLORATION TECHNOLOGIES CORP",
+      "evidence": "KIS official stock master; current 30-stock watchlist"
+    },
+    "TEM": {
+      "asset_type": "stock",
+      "name": "TEMPUS AI INC",
+      "evidence": "KIS official stock master; current 30-stock watchlist"
+    },
+    "TSLA": {
+      "asset_type": "stock",
+      "name": "TESLA INC",
+      "evidence": "KIS official stock master; current 30-stock watchlist"
+    },
+    "CVX": {
+      "asset_type": "stock",
+      "name": "CHEVRON CORPORATION",
+      "evidence": "KIS official stock master; current 30-stock watchlist"
+    },
+    "IBM": {
+      "asset_type": "stock",
+      "name": "INTERNATIONAL BUS MACH CORP",
+      "evidence": "KIS official stock master; current 30-stock watchlist"
+    },
+    "IONQ": {
+      "asset_type": "stock",
+      "name": "IONQ INC",
+      "evidence": "KIS official stock master; current 30-stock watchlist"
+    },
+    "JNJ": {
+      "asset_type": "stock",
+      "name": "JOHNSON & JOHNSON",
+      "evidence": "KIS official stock master; current 30-stock watchlist"
+    },
+    "JOBY": {
+      "asset_type": "stock",
+      "name": "JOBY AVIATION INC",
+      "evidence": "KIS official stock master; current 30-stock watchlist"
+    },
+    "LLY": {
+      "asset_type": "stock",
+      "name": "ELI LILLY AND COMPANY",
+      "evidence": "KIS official stock master; current 30-stock watchlist"
+    },
+    "O": {
+      "asset_type": "stock",
+      "name": "REALTY INCOME CORP",
+      "evidence": "KIS official stock master; current 30-stock watchlist"
+    },
+    "RBLX": {
+      "asset_type": "stock",
+      "name": "ROBLOX CORPORATION",
+      "evidence": "KIS official stock master; current 30-stock watchlist"
+    },
+    "T": {
+      "asset_type": "stock",
+      "name": "AT&T INC",
+      "evidence": "KIS official stock master; current 30-stock watchlist"
+    },
+    "VZ": {
+      "asset_type": "stock",
+      "name": "VERIZON COMMUNICATIONS",
+      "evidence": "KIS official stock master; current 30-stock watchlist"
+    },
+    "005930": {
+      "asset_type": "stock",
+      "name": "삼성전자",
+      "evidence": "Existing verified KIS stock configuration"
+    },
+    "000660": {
+      "asset_type": "stock",
+      "name": "SK하이닉스",
+      "evidence": "Existing verified KIS stock configuration"
+    },
+    "066570": {
+      "asset_type": "stock",
+      "name": "LG전자",
+      "evidence": "Existing verified KIS stock configuration"
+    },
+    "HPQ": {
+      "asset_type": "stock",
+      "name": "HP",
+      "evidence": "Existing verified KIS stock configuration"
+    },
+    "DELL": {
+      "asset_type": "stock",
+      "name": "Dell",
+      "evidence": "Existing verified KIS stock configuration"
+    },
+    "SONY": {
+      "asset_type": "stock",
+      "name": "Sony",
+      "evidence": "Existing verified KIS stock configuration"
+    },
+    "GOOG": {
+      "asset_type": "stock",
+      "name": "Alphabet Class C",
+      "evidence": "Existing verified KIS stock configuration"
+    },
+    "SPY": {
+      "asset_type": "etf",
+      "name": "SPDR S&P 500 ETF Trust",
+      "evidence": "Existing SPY market benchmark ETF",
+      "futures_based": false,
+      "futures_review": {
+        "symbol": "SPY",
+        "status": "non_futures",
+        "checked_on": "2026-10-30",
+        "basis": "공식 SPY 투자설명서 Investment Restrictions에서 선물·옵션·스왑 등 파생상품 투자를 금지함. 주가지수 구성 주식 보유 방식.",
+        "source": {
+          "kind": "issuer_official_document",
+          "url": "https://www.ssga.com/library-content/products/fund-docs/etfs/apac/prospectus-sg-en-spy.pdf",
+          "sha256": "ac0cfa5eecb6b5d3e1a7a8f8aa1be833b75f3e2d4093b56ba14cbb36cf7f0a8b",
+          "section": "INVESTMENT RESTRICTIONS"
+        },
+        "limitation": "공식 제공본의 명시적 투자 제한을 판정 근거로 사용. ETF에 대한 외부 옵션 상장 여부와 ETF 내부의 파생상품 투자는 다름."
+      }
+    },
+    "069500": {
+      "asset_type": "etf",
+      "name": "KODEX 200",
+      "evidence": "Existing KOSPI 200 ETF benchmark",
+      "futures_based": null,
+      "futures_review": {
+        "symbol": "069500",
+        "status": "unknown",
+        "checked_on": "2026-10-30",
+        "basis": "공식 상품 개요에서 KOSPI200 주식지수 추종은 확인. 선물 사용을 배제할 명시적 제한·전체 운용 근거를 확보하지 못해 불허 유지.",
+        "source": {
+          "kind": "issuer_official_document",
+          "url": "https://www.samsungfund.com/etf/product/view.do?id=2ETF01",
+          "sha256": "a31abf57418365d9ea2f141b17c061ba41159f609311cea763f97d678734e8a9"
+        }
+      },
+      "policy_exception": {
+        "id": "kodex200-user-allow-20261101",
+        "symbol": "069500",
+        "authorized_on": "2026-11-01",
+        "authority": "user_explicit_instruction",
+        "scope": "unconfirmed_futures_evidence_only",
+        "reason": "사용자 명시 요청: kodex200은 허용. 선물 미사용 확인 결과로 해석하지 않음."
+      }
+    },
+    "MRVL": {
+      "asset_type": "stock",
+      "name": "MARVELL TECHNOLOGY INC",
+      "evidence": "KIS official USD stock master security_type=2; https://investor.marvell.com/sec-filings/all-sec-filings/content/0001835632-26-000011/mrvl-20260131.htm"
+    },
+    "TMUS": {
+      "asset_type": "stock",
+      "name": "T-MOBILE US INC",
+      "evidence": "KIS official USD stock master security_type=2; https://investor.t-mobile.com/resources/investor-faqs/default.aspx"
+    },
+    "ABBV": {
+      "asset_type": "stock",
+      "name": "ABBVIE INC",
+      "evidence": "KIS official USD stock master security_type=2; https://investors.abbvie.com/static-files/f66414fa-2635-4b87-b6b1-d3f99148135d"
+    },
+    "ADC": {
+      "asset_type": "stock",
+      "name": "AGREE REALTY CORP",
+      "evidence": "KIS official USD stock master security_type=2; https://investors.agreerealty.com/overview/default.aspx"
+    },
+    "F": {
+      "asset_type": "stock",
+      "name": "FORD MOTOR CO",
+      "evidence": "KIS official USD stock master security_type=2; https://www.shareholder.ford.com/Information/stock/default.aspx"
+    },
+    "GM": {
+      "asset_type": "stock",
+      "name": "GENERAL MOTORS CO",
+      "evidence": "KIS official USD stock master security_type=2; https://investor.gm.com/"
+    },
+    "MRK": {
+      "asset_type": "stock",
+      "name": "MERCK & CO INC",
+      "evidence": "KIS official USD stock master security_type=2; https://www.merck.com/media/company-fact-sheet/"
+    },
+    "NNN": {
+      "asset_type": "stock",
+      "name": "NNN REIT INC",
+      "evidence": "KIS official USD stock master security_type=2; https://www.nnnreit.com/investor-relations/"
+    },
+    "ORCL": {
+      "asset_type": "stock",
+      "name": "ORACLE CORP",
+      "evidence": "KIS official USD stock master security_type=2; https://investor.oracle.com/faq/default.aspx"
+    },
+    "PINS": {
+      "asset_type": "stock",
+      "name": "PINTEREST INC",
+      "evidence": "KIS official USD stock master security_type=2; https://investor.pinterestinc.com/overview/default.aspx"
+    },
+    "SHEL": {
+      "asset_type": "stock",
+      "name": "SHELL PLC SPON ADS EA REP 2 ORD SHS",
+      "evidence": "KIS official USD stock master security_type=2; https://www.shell.com/investors/information-for-shareholders/share-prices/share-price-summary/shell-nyse-usd.html"
+    },
+    "SNAP": {
+      "asset_type": "stock",
+      "name": "SNAP INC",
+      "evidence": "KIS official USD stock master security_type=2; https://investor.snap.com/overview/default.aspx"
+    },
+    "XOM": {
+      "asset_type": "stock",
+      "name": "EXXONMOBIL HOLDINGS CORPORATION",
+      "evidence": "KIS official USD stock master security_type=2; https://investor.exxonmobil.com/"
+    }
+  }
+}

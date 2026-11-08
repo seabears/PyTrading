@@ -1,0 +1,38 @@
+{
+  "max_age_hours": 24,
+  "allowed_sources": {
+    "KR": [
+      {"domain": "yna.co.kr", "publishers": ["연합뉴스", "Yonhap News Agency"]},
+      {"domain": "news.einfomax.co.kr", "publishers": ["연합인포맥스"]},
+      {"domain": "hankyung.com", "publishers": ["한국경제", "한국경제신문", "한경닷컴"]},
+      {"domain": "mk.co.kr", "publishers": ["매일경제"]},
+      {"domain": "biz.chosun.com", "publishers": ["Chosunbiz", "조선비즈"]},
+      {"domain": "sedaily.com", "publishers": ["서울경제", "서울경제신문"]}
+    ],
+    "US": [
+      {"domain": "reuters.com", "publishers": ["Reuters"]},
+      {"domain": "bloomberg.com", "publishers": ["Bloomberg", "Bloomberg.com"]},
+      {"domain": "wsj.com", "publishers": ["The Wall Street Journal", "Wall Street Journal"]},
+      {"domain": "ft.com", "publishers": ["Financial Times"]}
+    ]
+  },
+  "company_aliases": {
+    "KR:005930": ["삼성전자", "Samsung Electronics"],
+    "KR:000660": ["SK하이닉스", "SK 하이닉스", "SK hynix"],
+    "KR:066570": ["LG전자", "LG Electronics"],
+    "US:MU": ["Micron", "마이크론"],
+    "US:AAPL": ["Apple", "AAPL"],
+    "US:MSFT": ["Microsoft", "MSFT"],
+    "US:NVDA": ["Nvidia", "NVDA"],
+    "US:HPQ": ["HP Inc", "HP Inc.", "HPQ", "Hewlett-Packard"],
+    "US:DELL": ["Dell", "DELL"],
+    "US:SONY": ["Sony", "SONY"],
+    "US:ARM": ["Arm Holdings", "Arm shares", "Arm stock", "암 홀딩스"],
+    "US:GOOG": ["Alphabet", "Google", "GOOG"],
+    "US:GOOGL": ["Alphabet", "Google", "GOOGL"],
+    "US:AMZN": ["Amazon", "AMZN"],
+    "US:META": ["Meta Platforms", "Meta", "META"],
+    "US:TSLA": ["Tesla", "TSLA"],
+    "US:SPCX": ["SpaceX", "SPCX", "Space Exploration Technologies"]
+  }
+}

@@ -1,0 +1,37 @@
+{
+  "families": {
+    "donchian": {
+      "breakout_days": [40, 70],
+      "exit_days": [15, 25],
+      "stop_atr": [2.0, 3.0],
+      "trailing_atr": [2.5, 3.5],
+      "holding_days": [84, 168],
+      "market_filter": [false]
+    },
+    "ma_trend": {
+      "fast_ma": [40, 60],
+      "slow_ma": [150, 250],
+      "stop_atr": [2.0, 3.0],
+      "trailing_atr": [2.5, 3.5],
+      "holding_days": [84, 168],
+      "market_filter": [false]
+    },
+    "momentum_rotation": {
+      "rotation_days": [10, 21],
+      "holding_days": [84, 168],
+      "market_filter": [false]
+    },
+    "low_vol_trend": {
+      "rotation_days": [10, 42],
+      "holding_days": [84, 168],
+      "market_filter": [false]
+    }
+  },
+  "minimum_family_stress_positive_fraction": 0.75,
+  "selection": {
+    "minimum_validation_trades": 30,
+    "maximum_validation_drawdown": 0.08,
+    "minimum_validation_profit_factor": 1.1,
+    "minimum_positive_validation_years": 2
+  }
+}

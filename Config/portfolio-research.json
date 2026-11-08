@@ -1,0 +1,13 @@
+{
+  "development_end": "2026-06-13T00:00:00Z",
+  "test_end": "2026-10-10T00:00:00Z",
+  "history_days": 1095,
+  "max_pages_per_symbol": 12,
+  "request_interval_seconds": 0.15,
+  "training_start": "2024-01-02",
+  "validation_start": "2025-04-02",
+  "test_start": "2026-06-15",
+  "maximum_test_drawdown": 0.05,
+  "minimum_test_trades": 30,
+  "assumed_spread_ratio": 0.001
+}

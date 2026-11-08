@@ -1,0 +1,11 @@
+{
+  "history_days": 120,
+  "max_pages_per_symbol": 600,
+  "request_interval_seconds": 0.15,
+  "training_fraction": 0.6,
+  "validation_fraction": 0.2,
+  "minimum_sessions_per_symbol": 60,
+  "minimum_test_trades_per_market": 30,
+  "maximum_test_drawdown": 0.05,
+  "assumed_spread_ratio": 0.001
+}

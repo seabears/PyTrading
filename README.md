@@ -1,215 +1,255 @@
-# PyTrading
+> 현재 내부 모의 운용·라즈베리파이·주문 차단 상태는 [현황](Docs/OPERATIONS_STATUS.md), [실행·복구](Docs/OPERATIONS_RUNBOOK.md), [배포](Deployment/raspberry-pi/README.md)를 참고하세요. 실계좌 주문은 전송하지 않습니다.
 
-KIS·Toss 시세 조회와 과거 데이터 기반 전략 검증을 위한 주식 자동매매 프로젝트입니다.
-Windows에서 개발하고 Raspberry Pi에서도 동일한 코드로 실행할 수 있도록 Python 표준
-라이브러리를 중심으로 구성했습니다.
+# 주식·채권·ETF만 허용
 
-> 백테스트 결과는 미래 수익을 보장하지 않습니다. 실제 주문 기능은 충분한 백테스트와
-> 모의투자 검증을 마친 뒤 사용해야 합니다.
+ETN과 나머지 상품은 불허한다. 공유 API도 종목 종류를 확인하며 미확인 종목을 차단한다.
+[현재 허용 상품과 API 상태](Docs/KIS_API_SUMMARY.md).
 
-## 프로젝트 구성
+# 선물·옵션·ELW: 코드 보존, 사용 불허
+
+구현 330개 중 허용 226개·불허 104개. 선물·옵션·ELW 전송·구독을 차단한다.
+[현재 API 상태](Docs/KIS_API_SUMMARY.md), [함수별 허용 여부](Docs/KIS_API_CATALOG.md).
+
+# 대출 기능 제거
+
+대출·신용·담보대출·대주 전용 API 8개를 제거했다. 공용 주문도 현금 거래만 허용한다.
+현재 API는 330개다. [현금 거래 제한 안내](Docs/KIS_API.md), [현재 함수 목록](Docs/KIS_API_CATALOG.md).
+
+# KIS 상품 API 추가
+
+공식 예제·포털 대조를 통한 338개 요청 함수와 REST·실시간 전송부를 추가했다.
+[사용·수정 안내](Docs/KIS_API.md), [전체 함수 목록](Docs/KIS_API_CATALOG.md).
+`python Code/main.py --test api`로 인증 없이 검사하고,
+`python Code/main.py --test api-live`로 미국 시세만 실제 확인한다.
+주문 전송은 기본 차단이며 기존 자동매매 실행에 연결하지 않았다.
+
+# 기본 연결: KIS
+
+현재 실행: `python Code/main.py`. [KIS 인증·설정 안내](Docs/KIS_SETUP.md)를 먼저 확인하세요.
+아래 토스 설명은 이전 연결 참고 자료입니다.
+
+## 현재 종목과 새 데이터 (2026-10-22)
+
+현재 실행은 요청한 미국 30종목이다. 알파벳은 GOOGL, 샌디스크는 SNDK다.
+종목 목록은 Config/settings.json의 symbols, 거래소는 Config/kis.json에서 수정한다.
+뉴스는 꺼져 있고 실제 주문 없이 내부 모의매매만 한다.
+
+새 시세 수집: `python Code/main.py --test history`.
+Data/history/daily와 minute에 KIS 시세를 저장한다. 시장 비교용 SPY는 매매 종목에 포함하지 않는다.
+[새 데이터 사용 안내](Docs/DATA_REFRESH.md), [실제 수집·품질 보고서](Data/reports/data-refresh/report.md).
+`--test strategies`를 새 KIS 자료와 연결했다. 아래의 17종목·뉴스·토스 연구 설명은 이전 구성이다.
+
+# 현재 실행 위치
+
+프로젝트 루트에서 `python Code/main.py`, 기능 선택은 `python Code/main.py --test`로 실행합니다.
+폴더별 역할은 [폴더 구조](Docs/FOLDER_LAYOUT.md)를 참고하세요.
+아래 `python main.py` 예시는 Code 폴더 안에서 실행하는 명령입니다.
+
+# PyTrading: 국내·미국 룰 기반 모의매매
+
+Windows에서 기능을 만들고 검증한 후 라즈베리파이로 옮기는 프로젝트다.
+Python 3.9 이상, 표준 라이브러리만으로 실행한다. 딥러닝·LLM·실제 주문 기능은 없다.
+설명 가능한 규칙과 한국어 주석, 사용자가 수정하기 쉬운 코드 구성을 우선한다.
+
+## Windows 실행
+
+CMD에서 실행한다. `Config/settings.json`은 프로젝트의 `Credentials/kis.env`를 기본으로 사용한다. 다른 위치의 파일은 아래 로컬 설정 방법으로 연결한다.
+인증값 자체를 설정 JSON이나 코드에 복사하지 않는다.
+
+```cmd
+cd /d "C:\Projects\PyTrading\Code"
+python main.py
+```
+
+인자 없이 계속 판단한다. 관찰 대상은 `../Config/settings.json`의 17개 종목이며, 전체 시세 검사 후 60초 대기,
+뉴스 수집 간격은 600초다. Ctrl+C로 종료하며 다음 실행은 기존 모의 계좌를 복원한다.
+휴장 중에는 WAIT가 정상이다. 뉴스 원문을 검토해 사건으로 등록하기 전에는 신규 모의 매수가 없다.
+
+삼성전자·SK하이닉스·LG전자·마이크론·Apple·HP·Dell·Sony·Arm·엔비디아·
+알파벳 GOOG/GOOGL·아마존·메타·마이크로소프트·테슬라·SpaceX가 설정돼 있다.
+알파벳 두 주식 종류는 각각 판단한다. 뉴스 검색어와 회사 이름 필터도 전 종목에 설정했다.
+관찰 17종목이 모두 매수되는 것은 아니다. 기존 조건과 시장별 최대 5종목 보유 제한을 적용한다.
+종목 추가·삭제는 `../Config/settings.json`의 symbols를 수정하고 재시작한다.
+뉴스 수집도 추가하려면 `../Config/news-queries.json`과 `../Config/news-filter.json`의 company_aliases를 함께 수정한다.
+
+## 폴더 구조
 
 ```text
-src/pytrading/
-├─ data/          # CSV 및 KIS 과거 데이터 입력
-├─ strategies/    # 매수·매도 신호 생성
-├─ backtest/      # 체결, 자산, 손익, MDD 계산
-├─ stocks/        # KIS/Toss 시세 제공자
-└─ reporting.py   # 결과 출력과 거래 내역 저장
+PyTrading/
+  Code/
+    main.py                   지속 실행·--test 진입점
+    ../Config/                   종목·전략·실행 설정
+                          뉴스·증권사·판단·모의 계좌·실행 코드
+    tools/                    기능 실행·연구·그래프 도구
+    tests/                    기능별 자동 테스트 코드
+    Docs/                     사용·개발 안내
+    ../Deployment/               라즈베리파이 서비스 예시
+    ../Credentials/              로컬 인증 파일 보관 (Git 제외)
+  Data/
+    history/                  실제 시세·지표·캐시
+    paper/                    모의 계좌·뉴스·판단·손익
+    confirmed-events.json     검토된 확정 뉴스
+    tests/fixtures/           기능 실행용 합성 입력
+    tests/results/            테스트·연구 결과·그래프
+    reports/                  이전·구조 변경 검증 보고서
+    cache/plots/              그래프 캐시
 ```
 
-현재 기본 전략은 단기·장기 단순 이동평균(SMA) 교차 전략입니다.
+Windows 개발 중 라즈베리파이 서비스 파일을 실행할 필요는 없다.
+실제 인증 파일·계좌 기록을 테스트 입력으로 사용하지 않는다.
 
-- 단기선이 장기선을 상향 돌파하면 매수
-- 단기선이 장기선을 하향 돌파하면 매도
-- 당일 종가로 신호를 계산하고 다음 거래일 시가에 체결
-- 수수료와 슬리피지 반영
-- 마지막 거래일에 보유 주식을 종가로 강제 청산
+## 기능별 직접 실행
 
-## 실행 방법
-
-명령행 인자는 사용하지 않습니다. 프로젝트 루트에서 메인 프로그램만 실행합니다.
-
-Windows PowerShell:
-
-```powershell
-$env:PYTHONPATH="src"
-python src/main.py
+```cmd
+python main.py --test
 ```
 
-Linux/Raspberry Pi:
+메뉴의 1~17번은 기능을 직접 실행하고 입력·결과를 보여준다. 9번은 지표, 10번은 사업군,
+11번은 조건 분석, 12~15번은 포트폴리오·순차 선택·방어 탐색, 16번은 장기 평가, 17번은 매도 보호 비교다. 18번은 자동 검증이다.
 
-```bash
-export PYTHONPATH=src
-python3 src/main.py
+`python main.py --test indicators`로 코스피·SPY·VIX·한국 3년 국채를 실제 수집해
+기존 일봉 규칙에 추가했을 때의 차이를 확인한다. [지표 연구 안내](Docs/INDICATORS.md)를 참고한다.
+
+`python main.py --test peers`로 설정된 17개 종목 중 상장일·자료 기준을 통과한 종목에
+고정 규칙을 비교 적용한다. 회사 목록은 `../Config/peers.json`, [비교 방법](Docs/PEERS.md)에 있다.
+
+`python main.py --test diagnostics`로 진입 차단·손실 청산을 보고서로 만들고 7개 조건의
+효과를 비교한다. [조건 분석 안내](Docs/DIAGNOSTICS.md)를 참고한다.
+
+| 실행 명령 | 실행 내용 |
+| --- | --- |
+| `python main.py --test news` | 실제 뉴스 수집·제목 후보 분류, 결과 파일 저장 |
+| `python main.py --test broker` | 토스 인증·시세 한 번 조회. 인증 파일 필요 |
+| `python main.py --test strategy` | 합성 시세로 판단만 실행. 조건 통과 여부·계산값 표시 |
+| `python main.py --test paper` | 합성 체결로 모의 계좌 실행. 현금·보유·손익·복원 표시 |
+| `python main.py --test settings` | 설정 로드·경로 해석 결과 표시. 인증값은 읽지 않음 |
+| `python main.py --test runner` | 실제 시세·뉴스·판단을 한 주기만 연결. 별도 모의 계좌 사용 |
+| `python main.py --test backtest` | 실제 과거 분봉 수집·가격 거래량 규칙 24개 비교·기간 분리 모의매매 |
+| `python main.py --test research` | 별도 3년 일봉에서 3단계 수정·검증 반복, 규칙 고정 후 역사 시험 |
+
+기능 실행 결과는 ../Data/tests/results에 저장하며 지속 실행 계좌와 분리한다.
+토스나 전체 연결 실행 전에는 같은 인증키를 쓰는 지속 실행을 종료한다.
+strategy·paper는 합성 데이터이며 실제 투자 성과가 아니다. 실제 주문은 제출하지 않는다.
+
+## 자동 검증
+
+직접 실행과 예상 결과를 비교하는 자동 검증은 구분한다.
+
+```cmd
+python main.py --test all
+python main.py --test unit-news
 ```
 
-메인 메뉴에서 `6. 현재 보유 목록 조회`를 선택하면
-`Portfolio/portfolio_holdings.csv`를 읽어 보유 종목, 수량, 평균단가,
-매입금액, 비중과 총매입금액을 표시합니다. CSV는 다음 열을 사용합니다.
+all은 전체 자동 검증, unit-뉴스/기능 이름은 해당 기능의 자동 검증이다.
+예: unit-broker, unit-strategy, unit-paper, unit-settings, unit-runner.
+과거 모의매매 자동 검증은 unit-research다. 메뉴의 18번에서도 자동 검증을 선택한다.
+자동 검증은 인터넷·실제 인증키를 사용하지 않는다.
 
-```csv
-티커,종목,시장,수량,평균단가_USD,매입금액_USD,비중_pct,투자유형,목표비중_pct,최대비중_pct
-MSFT,마이크로소프트,NASDAQ,8,402.2125,3217.70,25.22,CORE,15,25
+상세 입력·결과·저장 위치는 [기능 실행·검증 안내](Docs/TESTING.md),
+확인된 결과와 미검증 범위·그래프는 [검증 기록](Docs/VALIDATION.md)에 있다.
+실제 과거 시세 연구의 기준과 한계는 [과거 모의매매 안내](Docs/BACKTEST.md)에 있다.
+반복 연구의 단계·기록·한계는 [반복 수정·검증 안내](Docs/RESEARCH_CYCLES.md)에 있다.
+
+## 코드 수정 위치
+
+| 바꿀 내용 | 파일·함수 |
+| --- | --- |
+| 뉴스 검색·제목 후보 분류 | `news/collector.py`: NEWS_QUERIES, CANDIDATE_RULES |
+| 뉴스 출처·회사 이름·사건 선별 | `../Config/news-filter.json`, `news/filtering.py` |
+| 검토 사건 등록 | `news/review.py`: approve_candidate |
+| 토스 시세·5분봉 합성 | `broker/toss.py`: collect_snapshot, aggregate_five_minute_bars |
+| 전략 기본값·매수 조건·매도 순서 | `strategy/engine.py`: DEFAULT_CONFIG, build_entry_conditions, evaluate |
+| 모의 체결·비용·계좌 상태 | `trading/paper.py`: PaperAccount |
+| 전체 반복 흐름·기록 | `app/runner.py`: main, record_decision |
+| 설정 검사·실행 잠금 | `app/runtime.py` |
+
+수정한 기능의 테스트부터 실행하고 전체 테스트로 연결을 확인한다.
+전략값은 settings.json의 strategy_config에 별도 JSON 경로를 지정해 기본값을 덮어쓸 수도 있다.
+설정의 상대 경로는 **프로젝트 루트 기준**이며 변경 후 재시작한다.
+기존 모의 계좌의 자금·비용 설정을 바꾸려면 output_dir을 새 폴더로 지정한다.
+
+## 뉴스와 판단 흐름
+
+Google News RSS에서 허용 출처로 검색 범위를 좁힌 뒤 종목별 결과를 최대 50개 가져온다.
+출처 도메인·언론사 이름, 회사 이름, 최근 발행 시각, 사건 종류를 검사한다.
+추측·주가 전망·단순 지분 변동 기사를 제외하고 선정 후보만 저장한다.
+전체 선정·제외 이유도 보고서에 남긴다. [뉴스 선별 기준](Docs/NEWS_FILTER.md)을 참고한다.
+저장 대상은 제목·언론사·기사 링크·발행 시각·최초 발견 시각이며 본문 자동 검증은 없다.
+제목 키워드는 실적 전망·계약·자사주·회계 문제의 **후보**만 분류한다.
+사람이 원문을 확인하고 등록한 사건만 매매 근거로 사용한다.
+
+```cmd
+python -m src.news.review
 ```
 
-`시장` 열은 새 파일에서 권장합니다. 현재 보유 CSV처럼 이 열이 없는 기존 파일은
-등록된 미국 종목의 거래소를 자동으로 적용합니다.
+원문을 직접 검토한 경우에만 실제 후보 ID·원문 주소·검토 메모로 등록한다.
 
-`투자유형`은 `CORE`, `TACTICAL`, `INCOME` 중 하나입니다.
-
-- `CORE`: 평균단가 손절 없이 장기 추세를 사용하고 최대 25%씩 단계적으로 축소
-- `TACTICAL`: 장기 추세와 모멘텀을 엄격히 적용하고 신규 매수분에만 ATR 손절 적용
-- `INCOME`: 가격만으로 추가매수하지 않고 배당 유지 여부를 수동 확인
-
-`7. 현재 보유 종목 매매 의견`은 최근 2년 KIS 일봉과 사용자가 입력한 추가 투자 가능
-현금을 사용해 `주의`, `25% 축소`, `50% 축소`, `전량매도 검토`, `추가매수`, `보유`,
-`수동검토`로 분류합니다.
-
-첫 실행 시 기존 수량은 레거시 보유분으로 등록되어 평균단가 손절을 소급 적용하지
-않습니다. 이후 CSV 수량이 증가하면 증가분만 신규 매수분으로 추적합니다. 실행 상태는
-`Portfolio/advisor_state.json`에 저장됩니다.
-
-추가매수는 한 번에 투자 가능 현금의 25%와 계좌 평가금액의 2% 중 작은 금액을 넘지
-않습니다. `INCOME` 종목은 배당 데이터가 없으므로 자동 추가매수하지 않습니다. 모든
-신호는 마지막 일봉 종가로 계산하며 실제 주문을 자동 제출하지 않습니다.
-
-실행하면 다음 메뉴가 표시됩니다.
-
-```text
-[기능 선택]
-1. 현재가 조회
-2. 과거 시세 조회
-3. KIS 실제 과거 데이터 백테스트
-4. CSV 파일 백테스트
-5. KIS 다중 종목 포트폴리오 백테스트
-6. 현재 보유 목록 조회
-7. 현재 보유 종목 매매 의견
-0. 종료
+```cmd
+python -m src.news.review --candidate-id "후보_ID" --kind earnings_guidance_raised --evidence-url "https://원문주소" --note "해당 회사 공식 발표에서 실적 전망 상향 확인"
 ```
 
-기능을 선택한 다음 시장, 종목, 조회 기간, 이동평균 기간, 초기 자금 등을 화면 안내에
-따라 입력합니다. Enter만 누르면 화면에 표시된 기본값을 사용합니다.
+매매 판단은 확정 긍정 사건, 완성 5분봉의 과거 20봉 최고가 돌파, 거래량 2배,
+호가 차이·추격 가격 한도·투자 예산·중복 진입 조건을 함께 검사한다.
+보유 중에는 손절·추적 손절·원가 보호·이익 보호를 먼저 검사하고 확정 악재·평균가격 이탈을 검사한다.
+비용 차감 고점 수익 3%부터 원가 보호, 5%부터 고점 순이익 50% 보호가 켜진다.
+설정은 `../Config/strategy.json`, 계산·비교 방법은 [매도 보호 안내](Docs/EXITS.md)에 있다.
+`python main.py --test exits`로 기존 장기 자료에서 매도 조건을 비교한다. 보호 가격보다 낮게 체결될 수 있다.
+수치와 사건 분류는 초기 가설이며 실제 수익성이 검증된 기준이 아니다.
+등록 시각부터 사건을 사용하며 과거 관찰 일지에 현재 뉴스를 소급 적용하지 않는다.
 
-번호, 날짜 형식과 순서, 숫자 범위, 종목 코드, CSV 경로가 올바르지 않으면 프로그램을
-종료하지 않고 해당 값을 다시 입력받습니다. KIS 조회 결과가 0건이면 종목·시장·기간을
-다시 선택합니다.
+`../Data/paper/account.json`은 가상 자금·보유·거래의 기준 기록이다.
+`decisions.jsonl`에는 당시 입력·판단·계좌 평가액, `summary.md`에는 시장별 현황이 있다.
+KRW와 USD를 합산하거나 실제 계좌에서 자금을 읽지 않는다.
+체결은 신호 시점 호가에 가정한 비용·슬리피지를 반영하며 주문 지연·부분 체결은 재현하지 않는다.
+`run.lock`은 종료 후에도 남고 OS 잠금만 해제되므로 실행 중 삭제하지 않는다.
 
-## KIS 환경 파일
+## 이후 라즈베리파이 이식
 
-프로젝트 루트의 [.env.example](.env.example)을 복사하여
-`C:\GIT\PyTrading\.env` 파일을 만들고 발급받은 값을 입력합니다.
+Windows 검증 후 폴더 전체를 옮기고 env_file 경로를 라즈베리파이에 맞게 수정한다.
+[이식 안내](../Deployment/raspberry-pi/README.md)에 실행·자동 시작 방법을 정리했다.
+토스 허용 IP는 실제 실행 장치의 네트워크 공인 IP와 일치해야 한다.
 
-```dotenv
-APP_KEY=발급받은_AppKey
-APP_SECRET=발급받은_AppSecret
-KIS_BASE_URL=https://openapi.koreainvestment.com:9443
-ACC_NO=12345678-01
-```
+공식 API 자료: [토스 개발자 문서](https://developers.tossinvest.com/).
+다운로드한 API 문서 사본과 PowerShell 실행 도우미는 제거했다.
 
-시세와 백테스트에는 `APP_KEY`, `APP_SECRET`만 필요합니다. `ACC_NO`는 향후 주문
-기능에서 사용합니다. 실전투자 앱 키는 `KIS_BASE_URL`을 생략해도 기본 실전 서버를
-사용합니다.
+코드와 데이터 위치는 [폴더 분리 안내](Docs/DATA_LAYOUT.md)를 참고한다. Code와 Data를 함께 보관·이식한다.
 
-모의투자 앱 키를 사용하는 경우에만 다음 주소를 지정합니다.
 
-```dotenv
-KIS_BASE_URL=https://openapivts.koreainvestment.com:29443
-```
+## 현재 운용 엔진으로 백테스트
 
-`.env`와 발급 토큰 파일은 Git에 커밋되지 않습니다.
+`python Code/main.py --test engine-backtest`로 저장 KIS 분봉을 공동 계좌에 재생합니다.
+실행·가정·결과 읽는 법은 [운용 엔진 백테스트](Docs/ENGINE_BACKTEST.md)를 참고하세요.
 
-## KIS 백테스트 데이터
 
-메뉴에서 `3. KIS 실제 과거 데이터 백테스트`를 선택합니다.
+## 다양한 알고리즘 실험
 
-- 국내주식: `005930`처럼 6자리 숫자를 입력하면 `KOREA` 시장 자동 선택
-- 미국주식: `AAPL`처럼 영문 종목을 입력한 뒤 `NASDAQ`, `NYSE`, `AMEX` 중 선택
-- 날짜: `YYYYMMDD` 형식
-- KIS 원본 일봉과 거래 결과는 원하는 경우 CSV로 저장
+`python Code/main.py --test algorithms`로 12개 고정 일봉 가설을 72회 비교하고 누적 기록합니다.
+[실행·수정·기록 안내](Docs/ALGORITHM_STUDY.md), [연구 일지](Docs/RESEARCH_LOG.md).
 
-국내주식은 KIS의 한 번당 조회 범위를 고려해 기간을 나눠 수집합니다. 해외주식은 조회
-기준일을 과거로 이동하며 반복 수집합니다. 중복 거래일을 제거하고 오래된 날짜부터
-정렬한 뒤 백테스트 엔진에 전달합니다.
 
-## 다중 종목 포트폴리오 백테스트
+## 한 항목씩 조정하는 추가 실험
 
-메뉴에서 `5. KIS 다중 종목 포트폴리오 백테스트`를 선택하고 같은 시장의 종목을
-공백이나 쉼표로 구분해 입력합니다.
+`python Code/main.py --test refinements`로 주변 설정을 비교합니다.
+[조정 범위·선정·기록 안내](Docs/ALGORITHM_REFINEMENTS.md). 기존 운용 설정은 변경하지 않습니다.
 
-```text
-AAPL MSFT NVDA AMZN GOOGL META
-```
 
-기본 전략:
+## 동종 산업군 확장
 
-- 종가가 200일 이동평균 위인 종목
-- 최근 126거래일(약 6개월) 모멘텀이 양수인 종목
-- 최근 20일 평균 거래대금 기준 통과
-- 연환산 변동성 60% 이하
-- 모멘텀 상위 최대 5종목을 동일 비중으로 보유
-- 20거래일마다 투자 대상 재선정
-- 종가가 20일 이동평균 아래면 청산
-- 매수가 대비 5% 손절
-- 보유 중 최고가 대비 7% 트레일링 스톱
-- 최소 현금 비중 5%
+`python Code/main.py --test industry-history`로 시세를 누적하고, `--test industry-peers`와 `--test industry-continuous`로 비교합니다.
+[수집·설정·기록 안내](Docs/INDUSTRY_STUDY.md).
 
-종목별 KIS 일봉은 `data/cache/<시장>/`에 자동 저장됩니다. 동일한 종목·기간은 캐시를
-재사용하며 화면에서 새로 받기를 선택할 수 있습니다. 캐시는 Git에 커밋되지 않습니다.
+매수 타이밍 연구: [실행·측정 방식](Docs/ENTRY_TIMING.md), [최신 보고서와 그래프](Data/reports/entry-timing/report.md).
 
-결과에는 누적 수익률 외에 다음 지표가 표시됩니다.
+## 인증 파일과 로컬 설정
 
-- 연복리수익률(CAGR) 10%와 MDD -15% 이내 목표 달성 여부
-- 전체 기간과 마지막 30% 검증 구간의 CAGR
-- 동일비중 단순 보유 CAGR
-- 최대 낙폭(MDD)
-- 샤프지수
-- 연도별 수익률
-- 거래 횟수, 승률, 총수수료
+- `Credentials/`에 시세용 `kis.env`(Windows) 또는 `kis-market.env`(Pi), 모의계좌용 `kis_demo.env`를 각각 보관한다.
+- 각 파일에는 `APP_KEY`와 `APP_SECRET`을 설정한다. 계좌 조회가 필요한 파일에는 `ACC_NO`도 설정한다. 실제 값은 로컬 파일에만 입력한다.
+- 기존 외부 경로를 계속 사용하려면 `Config/settings.json`의 복사본을 `Credentials/settings-windows.local.json`에 두고 복사본의 `env_file`을 수정한다. 다른 상대 경로는 기존과 동일하게 `Code/` 기준이다.
+- 모의계좌 조회 도구는 `--env-file`로 모의 인증 파일을 지정할 수 있다. Pi 연결 도구는 `PYTRADING_PI_HOST` 또는 로컬 SSH 설정의 `pytrading-pi` 별칭을 사용한다.
 
-연 10%는 보장 수익률이 아니라 과거 데이터 검증 기준입니다. 전체 기간과 시간순으로
-분리한 마지막 30% 검증 구간이 모두 CAGR 목표를 넘고, 전체 MDD가 -15% 이내여야
-달성으로 표시합니다. 최소 1년 이상의 기간을 입력할 수 있지만 신뢰도 있는 평가는 여러
-상승·하락장을 포함한 장기간으로 수행해야 합니다.
+프로젝트 루트의 CMD에서 로컬 설정을 지정해 실행한다.
 
-현재 투자 대상 목록은 사용자가 입력하므로, 오늘 존재하는 종목만 과거에도 존재했다고
-간주하는 생존편향에 주의해야 합니다. 향후에는 시점별 상장·편출입 정보를 저장해 이
-편향을 줄이는 것이 다음 데이터 개선 과제입니다.
-
-## CSV 백테스트
-
-메뉴에서 `4. CSV 파일 백테스트`를 선택하고 파일 경로를 입력합니다. CSV에는 다음
-헤더가 필요하며 `volume`은 생략할 수 있습니다.
-
-```csv
-date,open,high,low,close,volume
-2026-01-02,100,102,99,101,1200
-```
-
-기능 확인용 파일은 `data/sample_prices.csv`에 있습니다.
-
-## 테스트
-
-```powershell
-$env:PYTHONPATH="src"
-python -m unittest discover -s tests -v
-```
-
-새로운 전략은 `pytrading.strategies.base.Strategy` 형태로 `name` 속성과
-`generate_signal(candles)` 메서드를 구현하면 기존 백테스트 엔진에서 사용할 수 있습니다.
-
-전략의 핵심 규칙은 다음 세 함수로 분리되어 있습니다.
-
-- `select_investment_targets()`: 장기 추세, 모멘텀, 평균 거래량으로 투자 후보 선택
-- `create_buy_signal()`: 단기 이동평균의 장기 이동평균 상향 돌파 확인
-- `create_sell_signal()`: 하향 돌파, 고정 손절, 트레일링 스톱 확인
-
-관련 파일은 다음과 같이 역할별로 나뉩니다.
-
-```text
-strategies/
-├─ stock_selector.py  # 투자할 종목 선택
-├─ buy.py             # 매수 신호
-├─ sell.py            # 매도 신호
-└─ indicators.py      # 이동평균 등 공통 지표
+```cmd
+set "PYTRADING_SETTINGS=%CD%\Credentials\settings-windows.local.json"
+python Code\main.py
 ```

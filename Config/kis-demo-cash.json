@@ -1,0 +1,9 @@
+{
+  "mode": "kis_demo",
+  "currency": "USD",
+  "cash_usd": "100000",
+  "source": "user_designation",
+  "authorized_on": "2026-11-01",
+  "scope": "cash_at_model_enrollment",
+  "note": "사용자가 모의 현금 계산 기준으로 명시 지정. API 잔액 검증 결과로 표시하지 않음."
+}

@@ -1,0 +1,39 @@
+{
+  "declared_at": "2026-10-27T12:47:24.562949+00:00",
+  "candidate": {
+    "name": "donchian__trailing_atr_3p5",
+    "family": "donchian",
+    "parent": "donchian__base",
+    "strategy": {
+      "fast_ma": 50,
+      "slow_ma": 200,
+      "breakout_days": 55,
+      "exit_days": 20,
+      "rotation_days": null,
+      "holding_days": 126
+    },
+    "risk": {
+      "stop_atr": 2.5,
+      "trailing_atr": 3.5
+    },
+    "market_filter": true,
+    "change": "trailing_atr: 3.0 -> 3.5"
+  },
+  "source_selection": "Data/reports/refinements/selection-before-evaluation.json",
+  "reason": "이전 개발·검증 기반 선정 후보를 재선정 없이 고정",
+  "historical_start": "2020-01-01",
+  "previous_cutoff": "2026-10-21",
+  "fresh_start": "2026-10-22",
+  "collection_end": "2026-10-26",
+  "short_comparison_start": "2026-09-18",
+  "short_comparison_end": "2026-10-21",
+  "scenarios": [
+    "base",
+    "double_cost"
+  ],
+  "optimization": false,
+  "minimum_forward_sessions": 20,
+  "minimum_closed_trades_for_review": 30,
+  "maximum_review_drawdown": 0.08,
+  "automatic_live_adoption": false
+}

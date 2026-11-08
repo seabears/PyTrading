@@ -1,0 +1,2 @@
+# 실행 의존성. 연구 그래프는 requirements-research.txt 사용. Python 3.11/3.12
+-r requirements-runtime.lock

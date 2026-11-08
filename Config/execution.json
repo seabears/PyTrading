@@ -1,0 +1,13 @@
+{
+  "internal_paper": {
+    "enabled": true
+  },
+  "kis_demo": {
+    "enabled": false,
+    "credentials_file": "../Credentials/kis_demo.env"
+  },
+  "live": {
+    "enabled": false,
+    "credentials_file": "../Credentials/kis.env"
+  }
+}

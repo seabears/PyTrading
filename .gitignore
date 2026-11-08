@@ -213,3 +213,46 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+
+# Migrated Code: local state, generated reports and secrets
+Code/__pycache__/
+Code/data/paper/
+Code/data/observations/
+Code/tests/results/
+*.lock
+Code/.test-*/
+Code/.plot-cache/
+.env
+.env.*
+*.env
+*.secret
+Code/data/history/
+Code/data/confirmed-events.json
+Code/data/advisor/
+Code/Portfolio/
+
+# Local trading data and generated reports
+/Data/
+/data/
+
+# 공통 코드 캐시와 외부 인증 파일
+__pycache__/
+*.pyc
+# Git은 빈 폴더를 저장하지 않으므로 자리표시자만 허용한다.
+/Credentials/*
+!/Credentials/.gitkeep
+
+# 실계좌·모의계좌 원장, 개인 포트폴리오와 인증 백업
+/Portfolio/
+*.sqlite
+*.sqlite-*
+*.sqlite3
+*.sqlite3-*
+*.pem
+*.key
+*.p12
+*.pfx
+*.env.*
+
+# Local deployment records and private backups
+/Local/

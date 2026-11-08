@@ -1,0 +1,21 @@
+{
+  "companies": [
+    {"symbol": "KR:005930", "name": "삼성전자", "group": "memory", "reference": "KR:005930", "source": "https://www.samsung.com/global/ir/"},
+    {"symbol": "KR:000660", "name": "SK하이닉스", "group": "memory", "reference": "KR:005930", "source": "https://news.skhynix.com/en/hbm-to-essd/"},
+    {"symbol": "US:MU", "name": "마이크론", "group": "memory", "reference": "KR:005930", "source": "https://www.micron.com/products/"},
+    {"symbol": "US:AAPL", "name": "애플", "group": "devices", "reference": "US:AAPL", "source": "https://investor.apple.com/"},
+    {"symbol": "KR:066570", "name": "LG전자", "group": "devices", "reference": "US:AAPL", "source": "https://www.lg.com/global/our-business/"},
+    {"symbol": "US:HPQ", "name": "HP", "group": "devices", "reference": "US:AAPL", "source": "https://investor.hp.com/why-hp/default.aspx"},
+    {"symbol": "US:DELL", "name": "Dell", "group": "devices", "reference": "US:AAPL", "source": "https://delltechnologies.gcs-web.com/why-dell"},
+    {"symbol": "US:SONY", "name": "Sony", "group": "devices", "reference": "US:AAPL", "source": "https://www.sony.com/en/SonyInfo/CorporateInfo/"},
+    {"symbol": "US:ARM", "name": "Arm", "group": "chip_design", "reference": "KR:005930", "source": "https://investors.arm.com/node/8281/html"},
+    {"symbol": "US:NVDA", "name": "엔비디아", "group": "chip_design", "reference": "KR:005930", "source": "https://investor.nvidia.com/"},
+    {"symbol": "US:GOOG", "name": "알파벳 Class C (구글)", "group": "platform_cloud", "reference": "US:AAPL", "source": "https://abc.xyz/investor/"},
+    {"symbol": "US:GOOGL", "name": "알파벳 Class A (구글)", "group": "platform_cloud", "reference": "US:AAPL", "source": "https://abc.xyz/investor/"},
+    {"symbol": "US:AMZN", "name": "아마존", "group": "platform_cloud", "reference": "US:AAPL", "source": "https://www.aboutamazon.com/what-we-do"},
+    {"symbol": "US:META", "name": "메타", "group": "platform_cloud", "reference": "US:AAPL", "source": "https://investor.atmeta.com/"},
+    {"symbol": "US:MSFT", "name": "마이크로소프트", "group": "platform_cloud", "reference": "US:AAPL", "source": "https://www.microsoft.com/en-us/Investor/"},
+    {"symbol": "US:TSLA", "name": "테슬라", "group": "mobility_space", "reference": "US:AAPL", "source": "https://ir.tesla.com/"},
+    {"symbol": "US:SPCX", "name": "SpaceX", "group": "mobility_space", "reference": "US:AAPL", "listed_on": "2026-06-12", "source": "https://www.nasdaq.com/newsroom/spacex-ipo-rocket-company-launches-historic-ipo"}
+  ]
+}

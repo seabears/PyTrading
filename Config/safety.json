@@ -1,0 +1,13 @@
+{
+  "enabled": true,
+  "daily_loss_limit": 0.02,
+  "maximum_trade_risk": 0.005,
+  "maximum_order_fraction": 0.1,
+  "maximum_exposure_fraction": 0.5,
+  "maximum_buys_per_day": 10,
+  "consecutive_losses": 3,
+  "loss_cooldown_minutes": 60,
+  "portfolio_quote_max_age_seconds": 180,
+  "maximum_quote_jump": 0.1,
+  "quote_reference_seconds": 300
+}

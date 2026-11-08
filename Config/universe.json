@@ -1,0 +1,16 @@
+{
+  "enabled": true,
+  "maximum_auto_symbols": 300,
+  "ranking_per_exchange": 300,
+  "maximum_ranking_pages": 5,
+  "minimum_spread_samples": 20,
+  "spread_sample_seconds": 60,
+  "retry_seconds": 300,
+  "minimum_price_usd": 5,
+  "minimum_market_cap_usd": 2000000000.0,
+  "minimum_turnover20_usd": 20000000.0,
+  "minimum_turnover5_usd": 5000000.0,
+  "maximum_atr_ratio": 0.08,
+  "maximum_spread_ratio": 0.002,
+  "request_interval_seconds": 1
+}

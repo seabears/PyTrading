@@ -1,0 +1,36 @@
+[Unit]
+Description=PyTrading frozen daily INTERNAL PAPER validation (no brokerage orders)
+Wants=network-online.target
+After=network-online.target
+StartLimitIntervalSec=600
+StartLimitBurst=3
+
+[Service]
+Type=notify
+NotifyAccess=main
+# 배포 예시. 설치 전 사용자와 프로젝트 경로를 대상 장비에 맞게 바꾼다.
+User=trader
+WorkingDirectory=/opt/PyTrading
+Environment=PYTHONUTF8=1
+Environment=PYTRADING_PROFILE=daily
+Environment=PYTRADING_DAILY_DIR=/opt/PyTrading/Data/device-validation/daily-observation
+Environment=PYTRADING_SETTINGS=/opt/PyTrading/Config/settings-linux.json
+ExecStart=/bin/sh /opt/PyTrading/Deployment/raspberry-pi/start.sh
+Restart=on-failure
+RestartSec=20
+TimeoutStartSec=180
+TimeoutStopSec=40
+WatchdogSec=180
+KillSignal=SIGTERM
+UMask=0077
+LimitCORE=0
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=read-only
+ReadWritePaths=/opt/PyTrading/Data
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

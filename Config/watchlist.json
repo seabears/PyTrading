@@ -1,0 +1,155 @@
+{
+  "description": "주요 판단 종목. 실행 목록은 settings.json symbols와 일치시킨다. 알파벳 GOOGL, 샌디스크 SNDK.",
+  "companies": {
+    "AAPL": {
+      "exchange": "NAS",
+      "name": "APPLE INC",
+      "currency": "USD"
+    },
+    "AMD": {
+      "exchange": "NAS",
+      "name": "ADVANCED MICRO DEVICES INC",
+      "currency": "USD"
+    },
+    "AMZN": {
+      "exchange": "NAS",
+      "name": "AMAZON COM INC",
+      "currency": "USD"
+    },
+    "ARM": {
+      "exchange": "NAS",
+      "name": "ARM HOLDINGS PLC SPON ADS EACH REP 1 ORD SHS",
+      "currency": "USD"
+    },
+    "ASML": {
+      "exchange": "NAS",
+      "name": "ASML HOLDING NV EUR0.09 NY REGISTRY SHS 2012",
+      "currency": "USD"
+    },
+    "AVGO": {
+      "exchange": "NAS",
+      "name": "BROADCOM INC",
+      "currency": "USD"
+    },
+    "COIN": {
+      "exchange": "NAS",
+      "name": "COINBASE GLOBAL INC",
+      "currency": "USD"
+    },
+    "GOOGL": {
+      "exchange": "NAS",
+      "name": "ALPHABET INC",
+      "currency": "USD"
+    },
+    "INTC": {
+      "exchange": "NAS",
+      "name": "INTEL CORP",
+      "currency": "USD"
+    },
+    "ISRG": {
+      "exchange": "NAS",
+      "name": "INTUITIVE SURGICAL INC",
+      "currency": "USD"
+    },
+    "META": {
+      "exchange": "NAS",
+      "name": "META PLATFORMS INC",
+      "currency": "USD"
+    },
+    "MSFT": {
+      "exchange": "NAS",
+      "name": "MICROSOFT CORP",
+      "currency": "USD"
+    },
+    "MU": {
+      "exchange": "NAS",
+      "name": "MICRON TECHNOLOGY INC",
+      "currency": "USD"
+    },
+    "NVDA": {
+      "exchange": "NAS",
+      "name": "NVIDIA CORP",
+      "currency": "USD"
+    },
+    "PLTR": {
+      "exchange": "NAS",
+      "name": "PALANTIR TECH INC",
+      "currency": "USD"
+    },
+    "QCOM": {
+      "exchange": "NAS",
+      "name": "QUALCOMM INC",
+      "currency": "USD"
+    },
+    "SNDK": {
+      "exchange": "NAS",
+      "name": "SANDISK CORP",
+      "currency": "USD"
+    },
+    "SPCX": {
+      "exchange": "NAS",
+      "name": "SPACE EXPLORATION TECHNOLOGIES CORP",
+      "currency": "USD"
+    },
+    "TEM": {
+      "exchange": "NAS",
+      "name": "TEMPUS AI INC",
+      "currency": "USD"
+    },
+    "TSLA": {
+      "exchange": "NAS",
+      "name": "TESLA INC",
+      "currency": "USD"
+    },
+    "CVX": {
+      "exchange": "NYS",
+      "name": "CHEVRON CORPORATION",
+      "currency": "USD"
+    },
+    "IBM": {
+      "exchange": "NYS",
+      "name": "INTERNATIONAL BUS MACH CORP",
+      "currency": "USD"
+    },
+    "IONQ": {
+      "exchange": "NYS",
+      "name": "IONQ INC",
+      "currency": "USD"
+    },
+    "JNJ": {
+      "exchange": "NYS",
+      "name": "JOHNSON & JOHNSON",
+      "currency": "USD"
+    },
+    "JOBY": {
+      "exchange": "NYS",
+      "name": "JOBY AVIATION INC",
+      "currency": "USD"
+    },
+    "LLY": {
+      "exchange": "NYS",
+      "name": "ELI LILLY AND COMPANY",
+      "currency": "USD"
+    },
+    "O": {
+      "exchange": "NYS",
+      "name": "REALTY INCOME CORP",
+      "currency": "USD"
+    },
+    "RBLX": {
+      "exchange": "NYS",
+      "name": "ROBLOX CORPORATION",
+      "currency": "USD"
+    },
+    "T": {
+      "exchange": "NYS",
+      "name": "AT&T INC",
+      "currency": "USD"
+    },
+    "VZ": {
+      "exchange": "NYS",
+      "name": "VERIZON COMMUNICATIONS",
+      "currency": "USD"
+    }
+  }
+}

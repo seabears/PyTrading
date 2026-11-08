@@ -1,0 +1,18 @@
+{
+  "periods": {
+    "development": {"start": "2020-01-01", "end": "2022-12-31"},
+    "validation": {"start": "2023-01-01", "end": "2024-12-31"},
+    "evaluation": {"start": "2025-01-01", "end": "dataset_end"}
+  },
+  "primary_variant": "breakout_trailing35",
+  "minimum_completed_trades_per_stock": 10,
+  "group_maximum_positions": 3,
+  "variants": [
+    {"name": "breakout_base", "family": "donchian", "strategy": {}, "risk": {}},
+    {"name": "breakout70", "family": "donchian", "strategy": {"breakout_days": 70}, "risk": {}},
+    {"name": "breakout_exit25", "family": "donchian", "strategy": {"exit_days": 25}, "risk": {}},
+    {"name": "breakout_trailing35", "family": "donchian", "strategy": {}, "risk": {"trailing_atr": 3.5}},
+    {"name": "ma_trend", "family": "ma_trend", "strategy": {}, "risk": {}},
+    {"name": "momentum21", "family": "momentum_rotation", "strategy": {"rotation_days": 21}, "risk": {}}
+  ]
+}

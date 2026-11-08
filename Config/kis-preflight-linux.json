@@ -1,0 +1,8 @@
+{
+  "credentials_file": "../Credentials/kis_demo.env",
+  "store": "../Data/execution/kis-demo-readonly/orders.sqlite",
+  "alias": "kis-demo-readonly",
+  "probe_symbol": "AAPL",
+  "probe_price": "100",
+  "history_days": 90
+}

@@ -1,0 +1,9 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=상태 확인
+Comment=PyTrading 내부 모의 운용 조회 전용
+Exec=/bin/sh -c "exec /bin/sh ~/CMD/.scripts/01_status.sh"
+Icon=utilities-terminal
+Terminal=true
+StartupNotify=false

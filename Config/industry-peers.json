@@ -1,0 +1,29 @@
+{
+  "start": "2018-01-01",
+  "maximum_pages": 200,
+  "groups": {
+    "telecom": {"name": "미국 통신", "symbols": ["T", "VZ", "TMUS"], "note": "무선 통신 공통, 유선·미디어·고객 구성이 다름"},
+    "fabless": {"name": "반도체 설계", "symbols": ["NVDA", "AMD", "AVGO", "QCOM", "MRVL"], "note": "팹리스 중심, GPU·통신·인프라 및 소프트웨어 매출 구성이 다름"},
+    "enterprise_cloud": {"name": "기업용 클라우드·IT", "symbols": ["MSFT", "IBM", "ORCL"], "note": "클라우드·기업 소프트웨어 공통, 컨설팅·하드웨어 비중은 다름"},
+    "pharma": {"name": "대형 제약", "symbols": ["JNJ", "LLY", "MRK", "ABBV"], "note": "의약품 공통, 치료 분야·의료기기·특허 만료 위험은 다름"},
+    "net_lease": {"name": "넷리스 리츠", "symbols": ["O", "NNN", "ADC"], "note": "장기 순임대 공통, 배당 현금 미포함 가격 수익률 한계가 특히 큼"},
+    "digital_ads": {"name": "온라인 광고", "symbols": ["GOOGL", "META", "PINS", "SNAP"], "note": "광고 공통, 검색·SNS·클라우드 매출 구성이 다름"},
+    "automotive": {"name": "자동차", "symbols": ["TSLA", "GM", "F"], "note": "완성차 공통, 전기차·내연기관·에너지 사업 구성이 다름"},
+    "integrated_energy": {"name": "종합 에너지", "symbols": ["CVX", "XOM", "SHEL"], "note": "생산·정제·판매 공통, 지역·LNG 비중이 다름. SHEL은 미국 ADS"}
+  },
+  "new_symbol_sources": {
+    "TMUS": "https://investor.t-mobile.com/resources/investor-faqs/default.aspx",
+    "MRVL": "https://investor.marvell.com/sec-filings/all-sec-filings/content/0001835632-26-000011/mrvl-20260131.htm",
+    "ORCL": "https://investor.oracle.com/faq/default.aspx",
+    "MRK": "https://www.merck.com/media/company-fact-sheet/",
+    "ABBV": "https://investors.abbvie.com/static-files/f66414fa-2635-4b87-b6b1-d3f99148135d",
+    "NNN": "https://www.nnnreit.com/investor-relations/",
+    "ADC": "https://investors.agreerealty.com/overview/default.aspx",
+    "PINS": "https://investor.pinterestinc.com/overview/default.aspx",
+    "SNAP": "https://investor.snap.com/overview/default.aspx",
+    "GM": "https://investor.gm.com/",
+    "F": "https://www.shareholder.ford.com/Information/stock/default.aspx",
+    "XOM": "https://investor.exxonmobil.com/",
+    "SHEL": "https://www.shell.com/investors/information-for-shareholders/share-prices/share-price-summary/shell-nyse-usd.html"
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "variants": ["baseline", "no_volume", "no_trend", "relaxed_chase", "longer_hold", "market_vix", "trend_follow"],
+  "relaxed_chase_ratio": 0.06,
+  "extended_holding_days": 20,
+  "minimum_positive_validation_fraction": 0.5
+}

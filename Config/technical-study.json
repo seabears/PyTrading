@@ -1,0 +1,39 @@
+{
+  "start": "2024-01-01",
+  "end": "2026-10-21",
+  "spread_ratio": 0.001,
+  "intraday": {
+    "atr_period": 14,
+    "volume_period": 10,
+    "volume_ratio": 1.5,
+    "maximum_holding_bars": 12
+  },
+  "swing": {
+    "atr_period": 14,
+    "fast": 20,
+    "slow": 60,
+    "momentum_period": 63,
+    "minimum_momentum": 0.0,
+    "maximum_holding_bars": 60
+  },
+  "risk": {
+    "risk_per_trade": 0.005,
+    "stop_atr": 2.0,
+    "trailing_atr": 3.0,
+    "daily_loss_limit": 0.01,
+    "maximum_entry_gap": 0.02,
+    "cooldown_bars": 3
+  },
+  "regime": {
+    "fast": 20,
+    "slow": 60,
+    "slope_period": 5,
+    "lag_calendar_days": 2,
+    "maximum_age_days": 7
+  },
+  "criteria": {
+    "minimum_trades": 30,
+    "maximum_drawdown": 0.05,
+    "minimum_profit_factor": 1.2
+  }
+}

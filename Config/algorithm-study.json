@@ -1,0 +1,21 @@
+{
+  "periods": {
+    "development": {"start": "2020-01-01", "end": "2022-12-31"},
+    "validation": {"start": "2023-01-01", "end": "2024-12-31"},
+    "evaluation": {"start": "2025-01-01", "end": "2026-10-21"}
+  },
+  "families": ["ma_trend", "donchian", "trend_pullback", "bollinger_reversion", "momentum_rotation", "low_vol_trend"],
+  "market_filters": [false, true],
+  "spread_ratio": 0.001,
+  "maximum_entry_gap": 0.03,
+  "risk_per_trade": 0.0025,
+  "stop_atr": 2.5,
+  "trailing_atr": 3.0,
+  "cooldown_days": 3,
+  "selection": {
+    "minimum_validation_trades": 30,
+    "maximum_validation_drawdown": 0.08,
+    "minimum_validation_profit_factor": 1.1,
+    "minimum_positive_validation_years": 2
+  }
+}

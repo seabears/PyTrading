@@ -1,0 +1,8 @@
+{
+  "lag_calendar_days": 2,
+  "maximum_age_days": 7,
+  "market_trend_days": 50,
+  "maximum_vix": 25,
+  "bond_change_days": 20,
+  "maximum_bond_rise_percentage_points": 0.25
+}

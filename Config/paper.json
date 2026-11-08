@@ -1,0 +1,8 @@
+{
+  "starting_cash": {"KR": 10000000, "US": 10000},
+  "allocation_fraction": 0.1,
+  "max_positions_per_market": 5,
+  "buy_cost_ratio": 0.001,
+  "sell_cost_ratio": 0.002,
+  "slippage_ratio": 0.001
+}

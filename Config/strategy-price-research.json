@@ -1,0 +1,11 @@
+{
+  "stop_loss": 0.03,
+  "trailing_stop": 0.04,
+  "breakeven_trigger": 0.03,
+  "profit_lock_trigger": 0.05,
+  "profit_keep_ratio": 0.5,
+  "exit_profit_buffer": 0.002,
+  "exit_sell_cost_ratio": 0.003,
+  "news_enabled": false,
+  "earnings_enabled": false
+}

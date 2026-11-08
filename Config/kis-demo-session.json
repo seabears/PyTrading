@@ -1,0 +1,28 @@
+{
+  "mode": "kis_demo",
+  "environment": "vps",
+  "enabled": false,
+  "symbol": "AAPL",
+  "order_type": "LIMIT",
+  "quantity": 1,
+  "maximum_concurrent_shares": 1,
+  "maximum_gross_buy_commitments_usd": "500",
+  "maximum_buy_attempts": 2,
+  "maximum_sell_attempts": 2,
+  "maximum_cancel_attempts": 2,
+  "maximum_active_minutes": 10,
+  "credentials_file": "../Credentials/kis_demo.env",
+  "new_orders_allowed": false,
+  "buying_power_service": "unknown",
+  "poll_seconds": 5,
+  "maximum_poll_count": 24,
+  "initial_reference": {
+    "currency": "USD",
+    "amount": "100000",
+    "source": "user_confirmation",
+    "confirmed_on": "2026-10-30"
+  },
+  "resume_store": null,
+  "risk_basis": "user_designated_demo_trial",
+  "risk_basis_authorized_on": "2026-11-02"
+}

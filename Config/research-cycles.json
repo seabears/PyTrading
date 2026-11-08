@@ -1,0 +1,14 @@
+{
+  "history_end": "2026-06-13T00:00:00Z",
+  "history_days": 1095,
+  "max_pages_per_symbol": 12,
+  "request_interval_seconds": 0.15,
+  "training_fraction": 0.6,
+  "validation_fraction": 0.2,
+  "minimum_training_trades": 10,
+  "minimum_validation_trades": 5,
+  "minimum_test_trades": 30,
+  "maximum_test_drawdown": 0.05,
+  "assumed_spread_ratio": 0.001,
+  "rounds": ["breakout", "trend_filter", "pullback"]
+}

@@ -1,0 +1,33 @@
+{
+  "daily": {
+    "horizons": [5, 10, 20], "step": 1, "max_wait": 10, "gap_limit": 0.03,
+    "modes": [
+      {"name": "next_open", "kind": "immediate"},
+      {"name": "delay_1", "kind": "delay", "wait": 1},
+      {"name": "delay_2", "kind": "delay", "wait": 2},
+      {"name": "confirm_1", "kind": "confirm", "wait": 1},
+      {"name": "retest_5", "kind": "retest", "wait": 5},
+      {"name": "retest_10", "kind": "retest", "wait": 10},
+      {"name": "volume_1p5", "kind": "volume", "minimum": 1.5},
+      {"name": "gap_1pct", "kind": "immediate", "gap_limit": 0.01}
+    ]
+  },
+  "intraday": {
+    "horizons": [5, 15, 30], "step": 5, "max_wait": 15, "gap_limit": 0.003,
+    "modes": [
+      {"name": "next_minute", "kind": "immediate"},
+      {"name": "delay_5min", "kind": "delay", "wait": 5},
+      {"name": "delay_15min", "kind": "delay", "wait": 15},
+      {"name": "confirm_5min", "kind": "confirm", "wait": 5},
+      {"name": "retest_15min", "kind": "retest", "wait": 15},
+      {"name": "gap_0p1pct", "kind": "immediate", "gap_limit": 0.001}
+    ]
+  },
+  "spread_ratio": 0.001,
+  "periods": {
+    "development": {"start": "2020-01-01", "end": "2022-12-31"},
+    "validation": {"start": "2023-01-01", "end": "2024-12-31"},
+    "evaluation": {"start": "2025-01-01", "end": "2026-10-23"}
+  },
+  "automatic_selection": false
+}
